@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-class hosonhanvienController extends Controller
+class HosonhanvienController extends Controller
 {
     public function list()
     {
-        return app('db')->connection()->select("SELECT * FROM hosonhanvien limit 10");
+        return app('db')->connection('mysql')->select("SELECT * FROM hosonhanvien limit 10");
     }
     public function detail($msdn)
     {

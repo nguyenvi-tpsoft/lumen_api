@@ -4,47 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $name = $request->name;
-        $email = $request->email;
-        $password = $request->password;
-
-        // Check if field is empty
-        if (empty($name) or empty($email) or empty($password)) {
-            return response()->json(['status' => 'error', 'message' => 'You must fill all the fields']);
-        }
-
-        // Check if email is valid
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return response()->json(['status' => 'error', 'message' => 'You must enter a valid email']);
-        }
-
-        // Check if password is greater than 5 character
-        if (strlen($password) < 6) {
-            return response()->json(['status' => 'error', 'message' => 'Password should be min 6 character']);
-        }
-
-        // Check if user already exist
-        if (User::where('email', '=', $email)->exists()) {
-            return response()->json(['status' => 'error', 'message' => 'User already exists with this email']);
-        }
-
-        // Create new user
+        //validate incoming request 
+        $this->validate($request, [
+            'hoten' => 'required|string',
+            'dienthoai' => 'required|string',
+            'msdn' => 'required|string',
+            'msdv' => 'required|string',
+            'password' => 'required',
+        ]);
         try {
-            $user = new User();
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->password = app('hash')->make($request->password);
+            $hoten = $request->input('hoten');
+            $msdn = $request->input('msdn');
+            $msdv = $request->input('msdv');
+            $dienthoai = $request->input('dienthoai');
+            $plainPassword = $request->input('password');
+            $password = app('hash')->make($plainPassword);
+            app('db')->connection('mysql')->select("INSERT INTO users(msdv,msdn,`password`,hoten,dienthoai) VALUES ('$msdv','$msdn','$password','$hoten','$dienthoai')");
 
-            if ($user->save()) {
-                return $this->login($request);
-            }
+            //return successful response
+            return response()->json(['msdn' => $msdn, 'hoten' => $hoten, 'message' => 'CREATED'], 201);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+            //return error message
+            return response()->json(['message' => 'User Registration Failed!'], 409);
         }
     }
 
@@ -62,36 +50,18 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $email = $request->email;
-        $password = $request->password;
+        //validate incoming request 
+        $this->validate($request, [
+            'msdn' => 'required|string',
+            'password' => 'required|string',
+        ]);
 
-        // Check if field is empty
-        if (empty($email) or empty($password)) {
-            return response()->json(['status' => 'error', 'message' => 'You must fill all the fields']);
-        }
+        $credentials = $request->only(['msdn', 'password']);
 
-        $credentials = request(['email', 'password']);
-
-        if (!$token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if (!$token = Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
 
         return $this->respondWithToken($token);
-    }
-
-    /**
-     * Get the token array structure.
-     *
-     * @param string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            // 'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
     }
 }

@@ -2,9 +2,9 @@
 
 return [
 
-   'default' => 'accounts',
+    'default' => 'accounts',
 
-   'connections' => [
+    'connections' => [
         'mysql' => [
             'driver'    => 'mysql',
             'host'      => env('DB_HOST'),
@@ -16,7 +16,7 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
-         ],
+        ],
 
         'mysql2' => [
             'driver'    => 'mysql',

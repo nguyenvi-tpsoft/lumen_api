@@ -10,8 +10,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('/login', 'AuthController@login');
 
     $router->group(['prefix' => 'hosonhanvien'], function () use ($router) {
-        $router->get('list', 'hosonhanvienController@list');
-        $router->get('detail/{msdn}', 'hosonhanvienController@detail');
+        $router->get('list', 'HosonhanvienController@list');
+        $router->get('detail/{msdn}', 'HosonhanvienController@detail');
     });
 
 
