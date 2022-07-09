@@ -36,7 +36,6 @@ class UserController extends Controller
     {
         $list = app('db')->connection('mysql')->select("SELECT msdv,dienthoai,msdn,hoten from hosonhanvien");
         return response()->json($list, 200);
-        // return response()->json(['users' =>  User::all()], 200);
     }
 
     /**

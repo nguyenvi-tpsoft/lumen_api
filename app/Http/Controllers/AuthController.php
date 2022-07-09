@@ -15,7 +15,7 @@ class AuthController extends Controller
         $this->validate($request, [
             'hoten' => 'required|string',
             'dienthoai' => 'required|string',
-            'msdn' => 'required|string',
+            'msdn' => 'required|string|unique:users',
             'msdv' => 'required|string',
             'password' => 'required',
         ]);
